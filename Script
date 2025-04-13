@@ -1,466 +1,303 @@
-local lplr = game.Players.LocalPlayer
-local char = lplr.Character or lplr.CharacterAdded:Wait()
+-- Function to handle animation detection and replacement
+local function handleAnimationDetection(animIdsToStop, replacementAnimId, animSpeed)
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
 
--- Object Removers (will remove vfx on the weapons, though)
-local katana1 = false -- Make true if you want to remove Blade Master's katana
-local katana2 = false -- Make true if you want to remove Sonic's katana
-local bat = false -- Make true if you want to remove Metal Bat's baseball bat
-if katana1 then char:FindFirstChild("Sheathe"):Destroy() char:FindFirstChild("#KATANAWEAPON"):Destroy() end
-if katana2 then char:FindFirstChild("Sheathed"):Destroy() char:FindFirstChild("#NinjaKATANA"):Destroy() end
-if bat then char:FindFirstChild("#BATWEAPON"):Destroy() end
+    local function onAnimPlayed(animationTrack)
+        local animId = tonumber(string.match(animationTrack.Animation.AnimationId, "%d+"))
+        
+        for _, stopId in ipairs(animIdsToStop) do
+            if animId == stopId then
+                animationTrack:Stop()
+                local replacementAnimation = Instance.new("Animation")
+                replacementAnimation.AnimationId = "rbxassetid://" .. replacementAnimId
+                local replacementTrack = humanoid:LoadAnimation(replacementAnimation)
+                replacementTrack:Play()
+                replacementTrack:AdjustSpeed(animSpeed) -- Adjust the speed of the replacement animation
+                break
+            end
+        end
+    end
+    
+    humanoid.AnimationPlayed:Connect(onAnimPlayed)
+end
 
--- Editing names
-local plrgui:PlayerGui = lplr:FindFirstChild("PlayerGui")
-local gui:ScreenGui = plrgui:FindFirstChild("ScreenGui")
-local ultbar:Frame = gui:FindFirstChild("MagicHealth")
-local ultbarclr:Frame = ultbar:FindFirstChild("Health").Bar.Bar
-local ulttext:TextButton = ultbar:FindFirstChild("TextLabel")
+-- First set of animations
+local firstAnimIdsToStop = {12534735382}
+local firstReplacementAnimId = 18896229321
+local firstAnimspeed = 2.7
+handleAnimationDetection(firstAnimIdsToStop, firstReplacementAnimId, firstAnimspeed)
 
--- Awakening text & color
-ulttext.Text = "Totality"
-ultbarclr.BackgroundColor3 = Color3.fromRGB(175, 0, 255) -- In RGB values (red, green, blue)
+-- Second set of animations
+local secondAnimIdsToStop = {12509505723}
+local secondReplacementAnimId = 79761806706382
+local secondAnimspeed = 3.5
+handleAnimationDetection(secondAnimIdsToStop, secondReplacementAnimId, secondAnimspeed)
 
-local hotbar:ScreenGui = plrgui:FindFirstChild("Hotbar")
+-- Third set of animations
+local thirdAnimIdsToStop = {12618271998}
+local thirdReplacementAnimId = 15436465829
+local thirdAnimspeed = 3
+handleAnimationDetection(thirdAnimIdsToStop, thirdReplacementAnimId, thirdAnimspeed)
+
+-- Fourth set of animations
+local fourthAnimIdsToStop = {12684390285}
+local fourthReplacementAnimId = 14920779925
+local fourthAnimspeed = 3.4
+handleAnimationDetection(fourthAnimIdsToStop, fourthReplacementAnimId, fourthAnimspeed)
+
+local player = game.Players.LocalPlayer
+
+local playerGui = player.PlayerGui
+
+local hotbar = playerGui:FindFirstChild("Hotbar")
+
 local backpack = hotbar:FindFirstChild("Backpack")
-local hotbarf:Frame = backpack:FindFirstChild("Hotbar")
-local bbb1, bbb2, bbb3, bbb4 = hotbarf["1"], hotbarf["2"], hotbarf["3"], hotbarf["4"]
-local bb1, bb2, bb3, bb4 = bbb1["Base"], bbb2["Base"], bbb3["Base"], bbb4["Base"]
-local b1, b2, b3, b4 = bb1["ToolName"], bb2["ToolName"], bb3["ToolName"], bb4["ToolName"]
 
--- Move names
-local function SetMoveNames()
-    b1.Text = "Translocation"
-    b2.Text = "Can you even see me?"
-    b3.Text = "Hyperspace Gate"
-    b4.Text = "Arise"
-end
-SetMoveNames()
+local hotbarFrame = backpack:FindFirstChild("Hotbar")
 
--- Awakening move names
-local function SetAwkNames()
-    b1.Text = "Hyperspace Veil"
-    b2.Text = "Eclipse Rend"
-    b3.Text = "Matched Frequency"
-    b4.Text = "Dark Fracture"
-end
+local baseButton = hotbarFrame:FindFirstChild("1").Base
 
--- Animations
--- Old Animations (Animations that are currently being replaced)
-local oldAnimations = {
-    m1 = "10469493270", -- Replace with the old m1 animation ID
-    m2 = "10469630950", -- Replace with the old m2 animation ID
-    m3 = "10469639222", -- Replace with the old m3 animation ID
-    m4 = "10469643643", -- Replace with the old m4 animation ID
-    ds = "10470104242", -- Actually, DON'T replace this
-    up = "10503381238", -- Actually, DON'T replace this
-    wc = "15955393872", -- Replace with the old wall combo animation ID
-    fdash = "18715858574", -- Actually, DON'T replace this
-    bdash = "...", -- Actually, DON'T replace this
-    ldash = "10480796021", -- Actually, DON'T replace this
-    rdash = "10480793962", -- Actually, DON'T replace this
-    awk = "12447707844", -- Replace with the old awakening animation ID
-    move1 = "10468665991", -- Replace with the old move 1 animation ID
-    move2 = "10466974800", -- Replace with the old move 2 animation ID
-    move3 = "10471336737", -- Replace with the old move 3 animation ID
-    move4 = "12510170988", -- Replace with the old move 4 animation ID
-    amove1 = "18715881168", -- Replace with the old awakening move 1 animation ID
-    amove2 = "11365563255", -- Replace with the old awakening move 2 animation ID
-    amove3 = "18715898844", -- Replace with the old awakening move 3 animation ID
-    amove4 = "18715891164", -- Replace with the old awakening move 4 animation ID
-}
-
--- New Animations (Animations that will replace the old ones)
-local newAnimations = {
-    m1 = "18716133404", -- Replace with your new m1 animation ID
-    m2 = "18716143973", -- Replace with your new m2 animation ID
-    m3 = "17889471098", -- Replace with your new m3 animation ID
-    m4 = "17889290569", -- Replace with your new m4 animation ID
-    ds = "10470104242", -- Replace with your new downslam animation ID
-    up = "10503381238", -- Replace with your new mini uppercut animation ID
-    wc = "76530443909428", -- Replace with your new wall combo animation ID
-    fdash = "15676072469", -- Replace with your new front dash animation ID
-    bdash = "13801083337", -- Replace with your new back dash animation ID
-    ldash = "18715789130", -- Replace with your new left dash animation ID
-    rdash = "18715789130", -- Replace with your new right dash animation ID
-    awk = "130301810149072", -- Replace with your new awakening animation ID
-    move1 = "15676072469", -- Replace with your new move 1 animation ID
-    move2 = "18464372850", -- Replace with your new move 2 animation ID
-    move3 = "18896124320", -- Replace with your new move 3 animation ID
-    move4 = "130301810149072", -- Replace with your new move 4 animation ID
-    amove1 = "18440406788", -- Replace with your new move awakening 1 animation ID
-    amove2 = "18716893399", -- Replace with your new move awakening 2 animation ID
-    amove3 = "17097146599", -- Replace with your new move awakening 3 animation ID
-    amove4 = "18464362124", -- Replace with your new move awakening 4 animation ID
-}
-
--- Code/functions to use in the handlers
-local function chat(msg: string)
-    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(msg, "All")
-end
-local function playAnimation(id, details)
-    local humanoid = char:FindFirstChildOfClass("Humanoid")
-    if not humanoid or not humanoid:FindFirstChild("Animator") then
-        warn("Invalid humanoid or humanoid has no Animator.")
-        return
-    end
-    
-    local animation = Instance.new("Animation")
-    animation.AnimationId = "rbxassetid://" .. tostring(id)
-    
-    local animator:Animator = humanoid:FindFirstChild("Animator")
-    local animationTrack = animator:LoadAnimation(animation)
-
-    animationTrack:Play()
-    
-    if details then
-        if details.Priority then
-            animationTrack.Priority = details.Priority
-        end
-        if details.Looped ~= nil then
-            animationTrack.Looped = details.Looped
-        end
-        if details.Speed then
-            animationTrack:AdjustSpeed(details.Speed)
-        end
-        if details.TimePosition then
-            animationTrack.TimePosition = details.TimePosition
-        end
-        if details.Weight then
-            animationTrack:AdjustWeight(details.Weight)
-        end
-    end
-
-    return animationTrack
-end
+local ToolName = baseButton.ToolName
 
 
--- Handlers for each m1s, the ultimate anim, and moves (if it doesnt have handlers, it would be a blank custom moveset script with no vfx, no other stuff other than custom animations)
--- Also handlers for the extraTools and extraMoves
-local handlers = {
-    m1 = function() end,
-    m2 = function() end,
-    m3 = function() end,
-    m4 = function() end,
-    wc = function() end,
-    fdash = function() end,
-    bdash = function() end,
-    ldash = function() end,
-    rdash = function() end,
+ToolName.Text = "Perilous Barrage"
 
-    awk = function(tr)
-        chat("IVE MADE A DEAL WITH THE DEVIL!")
-        task.wait(2)
-local assetId = 2941208080 -- Your slash asset ID
-
--- Get the local player and character
 local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local hrp = character:WaitForChild("HumanoidRootPart")
 
--- Load the slash model
-local success, result = pcall(function()
-    return game:GetObjects("rbxassetid://" .. assetId)
-end)
+local playerGui = player.PlayerGui
 
-if success and #result > 0 then
-    local slash = result[1]
-    slash.Parent = workspace
+local hotbar = playerGui:FindFirstChild("Hotbar")
 
-    -- Ensure the model has a PrimaryPart
-    if not slash.PrimaryPart then
-        slash.PrimaryPart = slash:FindFirstChildWhichIsA("BasePart")
-        if not slash.PrimaryPart then
-            warn("No PrimaryPart found in model.")
-            return
-        end
-    end
+local backpack = hotbar:FindFirstChild("Backpack")
 
-    -- Position it in front of the character
-    local offset = hrp.CFrame.LookVector * 0
-    local spawnCFrame = hrp.CFrame + offset
-    slash:SetPrimaryPartCFrame(spawnCFrame)
+local hotbarFrame = backpack:FindFirstChild("Hotbar")
 
-    -- Stay for 5 seconds
-    wait(5)
-    slash:Destroy()
-    print("Slash removed after 5 seconds.")
-else
-    warn("Failed to load slash asset.")
-end
-    end,
+local baseButton = hotbarFrame:FindFirstChild("2").Base
 
-    move1 = function(tr)
-        local hrp = char:FindFirstChild("HumanoidRootPart")
+local ToolName = baseButton.ToolName
 
-        local bloodvfx = game.ReplicatedStorage.Resources.BloodSplatter.Attachment:Clone()
-        bloodvfx.Parent = char:FindFirstChild("Torso")
-        for _, v in pairs(game.ReplicatedStorage.Resources.BloodSplatter.Attachment:GetChildren()) do
-            if v:IsA("ParticleEmitter") then
-                v.Enabled = false
-                v:Emit(100)
-            end
-        end
-        bloodvfx:Destroy()
 
-        task.wait(0.7)
-        if not tr.IsPlaying then
-            return
-        end
-        local blood = Instance.new("Part")
-        blood.Size = Vector3.new(0.25, 0.25, 60)
-        blood.CFrame = hrp.CFrame * CFrame.new(0, 0, -25)
-        blood.CanCollide = false
-        blood.Anchored = true
+ToolName.Text = "Matched Energy"
 
-        blood.Color = Color3.fromRGB(200, 0, 0)
-        blood.Material = Enum.Material.Neon
-        blood.CastShadow = false
-        blood.Parent = workspace
-        for _, v in pairs(game.ReplicatedStorage.Resources.BloodSplatter.Attachment:GetChildren()) do
-            if v:IsA("ParticleEmitter") then
-                local cl = v:Clone()
-                cl.Parent = blood
-                cl:Emit(200)
-            end
-        end
-        game:GetService("Debris"):AddItem(blood, 1)
-    end,
-
-    move2 = function(tr:AnimationTrack)
-        local bloodvfx = game.ReplicatedStorage.Resources.BloodSplatter.Attachment:Clone()
-        bloodvfx.Parent = char:FindFirstChild("Torso")
-        for _, v in pairs(game.ReplicatedStorage.Resources.BloodSplatter.Attachment:GetChildren()) do
-            if v:IsA("ParticleEmitter") then
-                v.Enabled = true
-            end
-        end
-
-        local c = tr.Ended:Once(function()
-            bloodvfx:Destroy()
-        end)
-
-        task.wait(2.5)
-        bloodvfx:Destroy()
-        c:Disconnect()
-    end,
-
-    move3 = function()
-local assetId = 15884559341 -- Your slash asset ID
-
--- Get the local player and character
 local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local hrp = character:WaitForChild("HumanoidRootPart")
 
--- Load the slash model
-local success, result = pcall(function()
-    return game:GetObjects("rbxassetid://" .. assetId)
-end)
+local playerGui = player.PlayerGui
 
-if success and #result > 0 then
-    local slash = result[1]
-    slash.Parent = workspace
+local hotbar = playerGui:FindFirstChild("Hotbar")
 
-    -- Ensure the model has a PrimaryPart
-    if not slash.PrimaryPart then
-        slash.PrimaryPart = slash:FindFirstChildWhichIsA("BasePart")
-        if not slash.PrimaryPart then
-            warn("No PrimaryPart found in model.")
-            return
-        end
-    end
+local backpack = hotbar:FindFirstChild("Backpack")
 
-    -- Position it in front of the character
-    local offset = hrp.CFrame.LookVector * 5
-    local spawnCFrame = hrp.CFrame + offset
-    slash:SetPrimaryPartCFrame(spawnCFrame)
+local hotbarFrame = backpack:FindFirstChild("Hotbar")
 
-    -- Stay for 5 seconds
-    wait(5)
-    slash:Destroy()
-    print("Slash removed after 5 seconds.")
-else
-    warn("Failed to load slash asset.")
-end
-    end,
+local baseButton = hotbarFrame:FindFirstChild("3").Base
 
-    move4 = function()
-    end,
+local ToolName = baseButton.ToolName
 
-    amove1 = function(tr)
-        print("choso awk")
-    task.wait(0.5)
-    chat("You filthy detestable human...")
-    task.wait(1)
-    chat("FEEL THE BLOOD DRAIN FROM YOU!")
-        playAnimation("17465453123", { Weight = 10, Speed = 1 })
-        task.wait(3)
-        playAnimation("13083332742", { Weight = 10, Speed = 1 })
-    
-    end,
-    
-    amove2 = function(tr)
-        print("choso awk")
-    chat("Impromptu.")
-    task.wait(0.5)
-    chat("Sliding Scales.")
-    task.wait(0.5)
-    chat("Hyperspace Expulsion.")
-    local assetId = 14963178629 -- Your slash asset ID
 
--- Get the local player and character
+ToolName.Text = "Supernova"
+
 local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local hrp = character:WaitForChild("HumanoidRootPart")
 
--- Load the slash model
-local success, result = pcall(function()
-    return game:GetObjects("rbxassetid://" .. assetId)
-end)
+local playerGui = player.PlayerGui
 
-if success and #result > 0 then
-    local slash = result[1]
-    slash.Parent = workspace
+local hotbar = playerGui:FindFirstChild("Hotbar")
 
-    -- Ensure the model has a PrimaryPart
-    if not slash.PrimaryPart then
-        slash.PrimaryPart = slash:FindFirstChildWhichIsA("BasePart")
-        if not slash.PrimaryPart then
-            warn("No PrimaryPart found in model.")
-            return
-        end
-    end
+local backpack = hotbar:FindFirstChild("Backpack")
 
-    -- Position it in front of the character
-    local offset = hrp.CFrame.LookVector * 0
-    local spawnCFrame = hrp.CFrame + offset
-    slash:SetPrimaryPartCFrame(spawnCFrame)
+local hotbarFrame = backpack:FindFirstChild("Hotbar")
 
-    -- Stay for 5 seconds
-    wait(6)
-    slash:Destroy()
-    print("Slash removed after 5 seconds.")
-else
-    warn("Failed to load slash asset.")
-end
-    end,
+local baseButton = hotbarFrame:FindFirstChild("4").Base
 
-    amove3 = function(tr)
-        print("choso awk")
-    chat("Hmph. Simple human.")
-    task.wait(3)
-    chat("Dodge this.")
-      playAnimation("106755459092436", { Weight = 10, Speed = 1 })
-    end,
+local ToolName = baseButton.ToolName
 
-    amove4 = function()
-        print("choso awk")
-    end,
-}
 
--- Table of animation data for the animations
-local animDt = {
-    move2 = { Speed = 1.0},
-}
+ToolName.Text = "Hypergate Smash"
 
-local hum = char:FindFirstChildOfClass("Humanoid")
-local animator = hum:FindFirstChildOfClass("Animator")
-for k, v in pairs(oldAnimations) do
-    animator.AnimationPlayed:Connect(function(tr)
-        if tr.Animation.AnimationId == "rbxassetid://" .. v and tr.Animation.AnimationId ~= "rbxassetid://" .. newAnimations[k] then
-            tr:Stop()
-            local trdt = animDt[k] or { Weight = 10 }
-            if not trdt["Weight"] then trdt.Weight = 10 end -- Avoid bad animation
-            local newtr = playAnimation(newAnimations[k], trdt)
-            task.spawn(function() handlers[k](newtr) end)
+-- Function to handle animation detection and replacement
+local function handleAnimationDetection(animIdsToStop, replacementAnimId, animSpeed)
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
 
-            if k == "awk" then
-                task.wait(1.20) -- Modify for your character's ultimate animation length
-                SetAwkNames()
+    local function onAnimPlayed(animationTrack)
+        local animId = tonumber(string.match(animationTrack.Animation.AnimationId, "%d+"))
+        
+        for _, stopId in ipairs(animIdsToStop) do
+            if animId == stopId then
+                animationTrack:Stop()
+                local replacementAnimation = Instance.new("Animation")
+                replacementAnimation.AnimationId = "rbxassetid://" .. replacementAnimId
+                local replacementTrack = humanoid:LoadAnimation(replacementAnimation)
+                replacementTrack:Play()
+                replacementTrack:AdjustSpeed(animSpeed) -- Adjust the speed of the replacement animation
+                break
             end
         end
-    end)
+    end
+    
+    humanoid.AnimationPlayed:Connect(onAnimPlayed)
 end
 
-lplr:GetAttributeChangedSignal("Ultimate"):Connect(function()
-    if lplr:GetAttribute("Ultimate") == 0 then
-        task.wait(0.5) SetMoveNames()
+-- First set of animations
+local firstAnimIdsToStop = {13047366862}
+local firstReplacementAnimId = 17857788598
+local firstAnimspeed = 1
+handleAnimationDetection(firstAnimIdsToStop, firstReplacementAnimId, firstAnimspeed)
+
+-- Second set of animations
+local secondAnimIdsToStop = {12832505612}
+local secondReplacementAnimId = 17838006839
+local secondAnimspeed = 0.5
+handleAnimationDetection(secondAnimIdsToStop, secondReplacementAnimId, secondAnimspeed)
+
+-- Third set of animations
+local thirdAnimIdsToStop = {13083332742}
+local thirdReplacementAnimId = 16515850153
+local thirdAnimspeed = 0.8
+handleAnimationDetection(thirdAnimIdsToStop, thirdReplacementAnimId, thirdAnimspeed)
+
+-- Fourth set of animations
+local fourthAnimIdsToStop = {13146710762}
+local fourthReplacementAnimId = 17861840167
+local fourthAnimspeed = 0.3
+handleAnimationDetection(fourthAnimIdsToStop, fourthReplacementAnimId, fourthAnimspeed)
+
+--Fourth set of animations
+local fourthAnimIdsToStop = {12772543293}
+local fourthReplacementAnimId = 18435303746
+local fourthAnimspeed = 1
+handleAnimationDetection(fourthAnimIdsToStop, fourthReplacementAnimId, fourthAnimspeed)
+
+-- Function to handle animation detection and replacement
+local function handleAnimationDetection(animIdsToStop, replacementAnimId, animSpeed)
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
+
+    local function onAnimPlayed(animationTrack)
+        local animId = tonumber(string.match(animationTrack.Animation.AnimationId, "%d+"))
+        
+        for _, stopId in ipairs(animIdsToStop) do
+            if animId == stopId then
+                animationTrack:Stop()
+                local replacementAnimation = Instance.new("Animation")
+                replacementAnimation.AnimationId = "rbxassetid://" .. replacementAnimId
+                local replacementTrack = humanoid:LoadAnimation(replacementAnimation)
+                replacementTrack:Play()
+                replacementTrack:AdjustSpeed(animSpeed) -- Adjust the speed of the replacement animation
+                break
+            end
+        end
     end
-end)
-
-loadstring(game:HttpGet("https://raw.githubusercontent.com/10tempest01/tempest-hub/refs/heads/main/Launcher.lua"))()
-
-local lplr = game.Players.LocalPlayer
-local char = lplr.Character or lplr.CharacterAdded:Wait()
-
--- Code/functions to use in the handlers
-local function chat(msg: string)
-    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(msg, "All")
+    
+    humanoid.AnimationPlayed:Connect(onAnimPlayed)
 end
 
-local function playAnimation(id, details)
-    local humanoid = char:FindFirstChildOfClass("Humanoid")
-    if not humanoid or not humanoid:FindFirstChild("Animator") then
-        warn("Invalid humanoid or humanoid has no Animator.")
-        return
-    end
+-- First set of animations
+local firstAnimIdsToStop = {13160158675}
+local firstReplacementAnimId = 18716884610
+local firstAnimspeed = 0.7
+handleAnimationDetection(firstAnimIdsToStop, firstReplacementAnimId, firstAnimspeed)
 
-    local animation = Instance.new("Animation")
-    animation.AnimationId = "rbxassetid://" .. tostring(id)
+-- Second set of animations
+local secondAnimIdsToStop = {13147719947}
+local secondReplacementAnimId = 17464644182
+local secondAnimspeed = 1.6
+handleAnimationDetection(secondAnimIdsToStop, secondReplacementAnimId, secondAnimspeed)
 
-    local animator:Animator = humanoid:FindFirstChild("Animator")
-    local animationTrack = animator:LoadAnimation(animation)
+-- Third set of animations
+local thirdAnimIdsToStop = {13079023611}
+local thirdReplacementAnimId = 79761806706382
+local thirdAnimspeed = 0.6
+handleAnimationDetection(thirdAnimIdsToStop, thirdReplacementAnimId, thirdAnimspeed)
 
-    -- Special handling for amove2 (loop at 1s)
-    if id == "13146710762" then
-        animationTrack.Looped = false  -- Prevent default looping
-        animationTrack.Stopped:Connect(function()
-            animationTrack.TimePosition = 1 -- Restart at 1 second
-            animationTrack:Play()
-        end)
-    end
+-- Fourth set of animations
+local fourthAnimIdsToStop = {13159656146}
+local fourthReplacementAnimId = 18903642853
+local fourthAnimspeed = 0.4
+handleAnimationDetection(fourthAnimIdsToStop, fourthReplacementAnimId, fourthAnimspeed)
 
-    animationTrack:Play()
+-- ult set of animations
+local ultAnimIdsToStop = {13186381096}
+local ultReplacementAnimId = 18445236460
+local ultAnimspeed = 0.4
+handleAnimationDetection(ultAnimIdsToStop, ultReplacementAnimId, ultAnimspeed)
 
-    if details then
-        if details.Priority then
-            animationTrack.Priority = details.Priority
-        end
-        if details.Looped ~= nil then
-            animationTrack.Looped = details.Looped
-        end
-        if details.Speed then
-            animationTrack:AdjustSpeed(details.Speed)
-        end
-        if details.TimePosition then
-            animationTrack.TimePosition = details.TimePosition
-        end
-        if details.Weight then
-            animationTrack:AdjustWeight(details.Weight)
-        end
-    end
+--Fourth set of animations
+local fourthAnimIdsToStop = {10479335397}
+local fourthReplacementAnimId = 17838006839
+local fourthAnimspeed = 1
+handleAnimationDetection(fourthAnimIdsToStop, fourthReplacementAnimId, fourthAnimspeed)
 
-    return animationTrack
-end
+local player = game.Players.LocalPlayer
 
--- Updated amove2 handler to use the new logic
-local handlers = {
-    amove2 = function()
-        local animTrack = playAnimation("13146710762", { Weight = 10, Speed = 0.3 })
+local playerGui = player.PlayerGui
 
-        -- Ensure it loops from 1s
-        animTrack.Stopped:Connect(function()
-            animTrack.TimePosition = 1
-            animTrack:Play()
-        end)
-    end
-}
+local hotbar = playerGui:FindFirstChild("Hotbar")
 
--- Rest of your script remains unchanged...
+local backpack = hotbar:FindFirstChild("Backpack")
 
-lplr:GetAttributeChangedSignal("Ultimate"):Connect(function()
-    if lplr:GetAttribute("Ultimate") == 0 then
-        task.wait(0.5) SetMoveNames()
-    end
-end)
+local hotbarFrame = backpack:FindFirstChild("Hotbar")
+
+local baseButton = hotbarFrame:FindFirstChild("5").Base
+
+local ToolName = baseButton.ToolName
+
+
+ToolName.Text = "Omni Directional Correction"
+
+local player = game.Players.LocalPlayer
+
+local playerGui = player.PlayerGui
+
+local hotbar = playerGui:FindFirstChild("Hotbar")
+
+local backpack = hotbar:FindFirstChild("Backpack")
+
+local hotbarFrame = backpack:FindFirstChild("Hotbar")
+
+local baseButton = hotbarFrame:FindFirstChild("6").Base
+
+local ToolName = baseButton.ToolName
+
+
+ToolName.Text = "Portal"
+
+local player = game.Players.LocalPlayer
+
+local playerGui = player.PlayerGui
+
+local hotbar = playerGui:FindFirstChild("Hotbar")
+
+local backpack = hotbar:FindFirstChild("Backpack")
+
+local hotbarFrame = backpack:FindFirstChild("Hotbar")
+
+local baseButton = hotbarFrame:FindFirstChild("7").Base
+
+local ToolName = baseButton.ToolName
+
+
+ToolName.Text = "Concentrated Plasma"
+
+local player = game.Players.LocalPlayer
+
+local playerGui = player.PlayerGui
+
+local hotbar = playerGui:FindFirstChild("Hotbar")
+
+local backpack = hotbar:FindFirstChild("Backpack")
+
+local hotbarFrame = backpack:FindFirstChild("Hotbar")
+
+local baseButton = hotbarFrame:FindFirstChild("8").Base
+
+local ToolName = baseButton.ToolName
+
+
+ToolName.Text = "Cosmic Totality"
+
+
 
